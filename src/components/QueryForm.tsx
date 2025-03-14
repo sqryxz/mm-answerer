@@ -46,7 +46,7 @@ export default function QueryForm({ onSubmit, isLoading }: QueryFormProps) {
           id="query"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md min-h-32 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 rounded-md min-h-32 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
           placeholder="Ask a question to multiple AI models..."
           disabled={isLoading}
         />
@@ -116,7 +116,7 @@ export default function QueryForm({ onSubmit, isLoading }: QueryFormProps) {
                 id="systemPrompt"
                 value={settings.systemPrompt}
                 onChange={handleSystemPromptChange}
-                className="w-full p-2 border border-gray-300 rounded-md text-sm h-20"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm h-20 text-gray-900"
                 placeholder="Instructions for the AI models..."
               />
               <p className="text-xs text-gray-500 mt-1">

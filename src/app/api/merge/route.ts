@@ -28,14 +28,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    // Query Gemini API
-    const geminiResponse = await queryGemini(query, querySettings);
+    let geminiResponse, deepseekResponse, mergedResponse;
 
-    // Query Deepseek API
-    const deepseekResponse = await queryDeepseek(query, querySettings);
+    try {
+      // Query Gemini API
+      geminiResponse = await queryGemini(query, querySettings);
+    } catch (error: any) {
+      console.error('Error querying Gemini:', error);
+      geminiResponse = `Error querying Gemini: ${error?.message || 'Unknown error'}`;
+    }
 
-    // Merge the responses
-    const mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
+    try {
+      // Query Deepseek API
+      deepseekResponse = await queryDeepseek(query, querySettings);
+    } catch (error: any) {
+      console.error('Error querying Deepseek:', error);
+      deepseekResponse = `Error querying Deepseek: ${error?.message || 'Unknown error'}`;
+    }
+
+    try {
+      // Merge the responses
+      mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
+    } catch (error: any) {
+      console.error('Error merging responses:', error);
+      mergedResponse = `Error merging responses: ${error?.message || 'Unknown error'}`;
+    }
 
     return NextResponse.json({ 
       query,
@@ -43,9 +60,12 @@ export async function POST(request: NextRequest) {
       deepseekResponse,
       mergedResponse
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error processing request:', error);
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to process request', 
+      details: error?.message || 'Unknown error' 
+    }, { status: 500 });
   }
 }
 
@@ -58,15 +78,21 @@ async function queryGemini(query: string, settings: QuerySettings): Promise<stri
       }
     });
 
+    // Create a chat session with the system instruction
     const chat = model.startChat({
-      systemInstruction: settings.systemPrompt,
+      history: [],
     });
 
+    // First, send the system instruction
+    await chat.sendMessage(settings.systemPrompt);
+    
+    // Then, send the user query
     const result = await chat.sendMessage(query);
+    
     return result.response.text();
   } catch (error) {
     console.error('Error querying Gemini:', error);
-    return 'Error querying Gemini API';
+    throw error; // Propagate the error for better debugging
   }
 }
 
@@ -82,9 +108,9 @@ async function queryDeepseek(query: string, settings: QuerySettings): Promise<st
     });
     
     return response.choices[0].message.content || '';
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error querying Deepseek:', error);
-    return 'Error querying Deepseek API';
+    throw error; // Propagate the error for better debugging
   }
 }
 
@@ -124,11 +150,17 @@ Please analyze both responses and create a comprehensive merged answer that:
 Your merged response should be more valuable than either individual response alone.
 `;
 
-    const result = await model.generateContent(mergePrompt);
+    // Create a chat session
+    const chat = model.startChat({
+      history: [],
+    });
+    
+    // Send the merge prompt
+    const result = await chat.sendMessage(mergePrompt);
     const mergedContent = result.response.text();
     
     return mergedContent;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error merging responses:', error);
     
     // Fallback to simple merging if intelligent merging fails

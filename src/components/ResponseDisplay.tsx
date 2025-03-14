@@ -157,19 +157,19 @@ ${mergedResponse}
 
         <div className="prose max-w-none">
           {activeTab === 'merged' && (
-            <div className="markdown-content">
+            <div className="markdown-content text-gray-900">
               <ReactMarkdown>{mergedResponse}</ReactMarkdown>
             </div>
           )}
 
           {activeTab === 'gemini' && (
-            <div className="markdown-content">
+            <div className="markdown-content text-gray-900">
               <ReactMarkdown>{geminiResponse}</ReactMarkdown>
             </div>
           )}
 
           {activeTab === 'deepseek' && (
-            <div className="markdown-content">
+            <div className="markdown-content text-gray-900">
               <ReactMarkdown>{deepseekResponse}</ReactMarkdown>
             </div>
           )}
