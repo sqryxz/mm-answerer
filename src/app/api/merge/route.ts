@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { OpenAI } from 'openai';
 
+// Check if Gemini API is available in the current region
+let isGeminiAvailable = true;
+
 // Initialize the Gemini API client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -16,6 +19,22 @@ interface QuerySettings {
   systemPrompt: string;
 }
 
+// Set a timeout for API calls to prevent long-running requests
+const API_TIMEOUT = 15000; // 15 seconds
+
+// Helper function to create a promise that rejects after a timeout
+function timeoutPromise(ms: number) {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms);
+  });
+}
+
+// Configure the API route for Vercel
+export const config = {
+  runtime: 'edge',
+  regions: ['iad1'], // Use a specific region for better performance
+};
+
 export async function POST(request: NextRequest) {
   try {
     const { query, settings } = await request.json();
@@ -28,33 +47,72 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    let geminiResponse, deepseekResponse, mergedResponse;
+    let geminiResponse: string = "", deepseekResponse: string = "", mergedResponse: string = "";
 
-    try {
-      // Query Gemini API
-      geminiResponse = await queryGemini(query, querySettings);
-    } catch (error: unknown) {
-      console.error('Error querying Gemini:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      geminiResponse = `Error querying Gemini: ${errorMessage}`;
+    // Only try Gemini if we think it's available
+    if (isGeminiAvailable) {
+      try {
+        // Query Gemini API with timeout
+        const geminiResult = await Promise.race([
+          queryGemini(query, querySettings),
+          timeoutPromise(API_TIMEOUT)
+        ]);
+        geminiResponse = geminiResult as string;
+      } catch (error: unknown) {
+        console.error('Error querying Gemini:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        
+        // If the error is related to location/region, mark Gemini as unavailable
+        if (typeof errorMessage === 'string' && 
+            (errorMessage.includes('location is not supported') || 
+            errorMessage.includes('User location is not supported'))) {
+          isGeminiAvailable = false;
+          console.log('Gemini API marked as unavailable in this region');
+        }
+        
+        geminiResponse = `Error querying Gemini: ${errorMessage}`;
+      }
+    } else {
+      geminiResponse = "Gemini API is not available in your region.";
     }
 
     try {
-      // Query Deepseek API
-      deepseekResponse = await queryDeepseek(query, querySettings);
+      // Query Deepseek API with timeout
+      const deepseekResult = await Promise.race([
+        queryDeepseek(query, querySettings),
+        timeoutPromise(API_TIMEOUT)
+      ]);
+      deepseekResponse = deepseekResult as string;
     } catch (error: unknown) {
       console.error('Error querying Deepseek:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       deepseekResponse = `Error querying Deepseek: ${errorMessage}`;
     }
 
-    try {
-      // Merge the responses
-      mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
-    } catch (error: unknown) {
-      console.error('Error merging responses:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      mergedResponse = `Error merging responses: ${errorMessage}`;
+    // If Gemini is not available, just return the Deepseek response
+    if (!isGeminiAvailable || geminiResponse.includes('Error querying Gemini')) {
+      mergedResponse = deepseekResponse;
+    } else {
+      try {
+        // Only attempt to merge if both responses are valid
+        const mergeResult = await Promise.race([
+          mergeResponses(query, geminiResponse, deepseekResponse, querySettings),
+          timeoutPromise(API_TIMEOUT)
+        ]);
+        mergedResponse = mergeResult as string;
+      } catch (error: unknown) {
+        console.error('Error merging responses:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        
+        // Use a simple fallback that doesn't require Gemini
+        mergedResponse = `
+# Response to: "${query}"
+
+${deepseekResponse}
+
+*Note: This response is from DeepSeek AI only. Gemini API response could not be included.*
+`;
+      }
     }
 
     return NextResponse.json({ 
@@ -117,6 +175,17 @@ async function mergeResponses(
   deepseekResponse: string,
   settings: QuerySettings
 ): Promise<string> {
+  // If Gemini response contains an error, just return the Deepseek response
+  if (geminiResponse.includes('Error querying Gemini') || !isGeminiAvailable) {
+    return `
+# Response to: "${query}"
+
+${deepseekResponse}
+
+*Note: This response is from DeepSeek AI only.*
+`;
+  }
+
   try {
     // Use Gemini to merge the responses intelligently
     const model = genAI.getGenerativeModel({ 
@@ -159,14 +228,18 @@ Your merged response should be more valuable than either individual response alo
     return `
 # Combined AI Response to: "${query}"
 
-## Gemini Response
-${geminiResponse}
-
 ## Deepseek Response
 ${deepseekResponse}
 
+${geminiResponse.includes('Error') ? '' : `
+## Gemini Response
+${geminiResponse}
+`}
+
 ## Summary
-Both models have provided their perspectives on your question. Consider the strengths of each response to form a more comprehensive understanding.
+${geminiResponse.includes('Error') 
+  ? 'Only the Deepseek model was able to provide a response to your question.' 
+  : 'Both models have provided their perspectives on your question. Consider the strengths of each response to form a more comprehensive understanding.'}
 `;
   }
 } 
