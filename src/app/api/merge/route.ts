@@ -22,6 +22,20 @@ export const config = {
   runtime: 'edge',
 };
 
+// Add a GET handler to handle GET requests
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ 
+    message: 'This endpoint requires a POST request with a JSON body containing a query field.',
+    example: {
+      query: 'Your question here',
+      settings: {
+        temperature: 0.7,
+        systemPrompt: 'You are a helpful assistant.'
+      }
+    }
+  }, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
   const appTimer = createTimer();
   logStart('API_REQUEST');
