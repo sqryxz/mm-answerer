@@ -82,17 +82,10 @@ async function queryGemini(query: string, settings: QuerySettings): Promise<stri
       }
     });
 
-    // Create a chat session with the system instruction
-    const chat = model.startChat({
-      history: [],
-    });
-
-    // First, send the system instruction
-    await chat.sendMessage(settings.systemPrompt);
+    // Use direct content generation with system instruction and user query
+    const systemAndQuery = `${settings.systemPrompt}\n\n${query}`;
     
-    // Then, send the user query
-    const result = await chat.sendMessage(query);
-    
+    const result = await model.generateContent(systemAndQuery);
     return result.response.text();
   } catch (error: unknown) {
     console.error('Error querying Gemini:', error);
@@ -154,13 +147,8 @@ Please analyze both responses and create a comprehensive merged answer that:
 Your merged response should be more valuable than either individual response alone.
 `;
 
-    // Create a chat session
-    const chat = model.startChat({
-      history: [],
-    });
-    
-    // Send the merge prompt
-    const result = await chat.sendMessage(mergePrompt);
+    // Use direct content generation instead of chat
+    const result = await model.generateContent(mergePrompt);
     const mergedContent = result.response.text();
     
     return mergedContent;
