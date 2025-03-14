@@ -26,10 +26,6 @@ export default function Home() {
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [settings, setSettings] = useState<QuerySettings>({
-    temperature: 0.7,
-    systemPrompt: 'You are a helpful assistant.',
-  });
 
   // Load history from localStorage on component mount
   useEffect(() => {
@@ -90,7 +86,6 @@ export default function Home() {
     const item = history.find((h) => h.id === id);
     if (item) {
       setResponseData(item.responses);
-      setSettings(item.settings);
     }
   };
 
