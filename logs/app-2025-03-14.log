@@ -1,0 +1,90 @@
+2025-03-14T16:44:36.128Z [INFO] [TEST_MD_LOG] Starting subroutine
+2025-03-14T16:44:36.134Z [INFO] [TEST_MD_LOG] Starting Markdown log test
+2025-03-14T16:44:36.134Z [INFO] [SUBROUTINE_A] Starting subroutine
+2025-03-14T16:44:36.134Z [INFO] [SUBROUTINE_A] Executing SUBROUTINE_A subroutine
+2025-03-14T16:44:36.635Z [SUCCESS] [SUBROUTINE_A] SUBROUTINE_A processing completed successfully
+2025-03-14T16:44:36.636Z [SUCCESS] [SUBROUTINE_A] Completed subroutine (completed in 502ms)
+2025-03-14T16:44:36.637Z [INFO] [SUBROUTINE_B] Starting subroutine
+2025-03-14T16:44:36.637Z [INFO] [SUBROUTINE_B] Executing SUBROUTINE_B subroutine
+2025-03-14T16:44:37.638Z [ERROR] [SUBROUTINE_B] Error: Simulated error in SUBROUTINE_B
+2025-03-14T16:44:37.639Z [SUCCESS] [SUBROUTINE_B] Completed subroutine (completed in 1003ms)
+2025-03-14T16:44:37.640Z [INFO] [SUBROUTINE_C] Starting subroutine
+2025-03-14T16:44:37.640Z [INFO] [SUBROUTINE_C] Executing SUBROUTINE_C subroutine
+2025-03-14T16:44:38.391Z [SUCCESS] [SUBROUTINE_C] SUBROUTINE_C processing completed successfully
+2025-03-14T16:44:38.391Z [SUCCESS] [SUBROUTINE_C] Completed subroutine (completed in 751ms)
+2025-03-14T16:44:38.391Z [INFO] [PARENT_ROUTINE] Starting subroutine
+2025-03-14T16:44:38.391Z [INFO] [PARENT_ROUTINE] Starting parent routine with nested children
+2025-03-14T16:44:38.392Z [INFO] [CHILD_ROUTINE_1] Starting subroutine
+2025-03-14T16:44:38.392Z [INFO] [CHILD_ROUTINE_1] Executing CHILD_ROUTINE_1 subroutine
+2025-03-14T16:44:38.693Z [SUCCESS] [CHILD_ROUTINE_1] CHILD_ROUTINE_1 processing completed successfully
+2025-03-14T16:44:38.693Z [SUCCESS] [CHILD_ROUTINE_1] Completed subroutine (completed in 301ms)
+2025-03-14T16:44:38.693Z [INFO] [CHILD_ROUTINE_2] Starting subroutine
+2025-03-14T16:44:38.693Z [INFO] [CHILD_ROUTINE_2] Executing CHILD_ROUTINE_2 subroutine
+2025-03-14T16:44:39.094Z [SUCCESS] [CHILD_ROUTINE_2] CHILD_ROUTINE_2 processing completed successfully
+2025-03-14T16:44:39.094Z [SUCCESS] [CHILD_ROUTINE_2] Completed subroutine (completed in 401ms)
+2025-03-14T16:44:39.094Z [SUCCESS] [PARENT_ROUTINE] Completed subroutine (completed in 800ms)
+2025-03-14T16:44:39.094Z [DEBUG] [TEST_MD_LOG] This is a debug message
+2025-03-14T16:44:39.094Z [WARNING] [TEST_MD_LOG] This is a warning message
+2025-03-14T16:44:39.094Z [INFO] [TEST_MD_LOG] This is an info message
+2025-03-14T16:44:39.095Z [SUCCESS] [TEST_MD_LOG] Completed subroutine (completed in 2967ms)
+2025-03-14T16:44:39.095Z [INFO] [LOGGER] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T16-44-36-127Z.md
+2025-03-14T16:53:09.236Z [INFO] [Markdown Log Test] Starting Markdown Log Test
+2025-03-14T16:53:09.242Z [INFO] [Markdown Log Test] Starting Markdown log test with descriptive subroutine names
+2025-03-14T16:53:09.242Z [INFO] [Data Processing Routine] Starting Data Processing Routine
+2025-03-14T16:53:09.242Z [INFO] [Data Processing Routine] Executing Data processing routine
+2025-03-14T16:53:09.743Z [SUCCESS] [Data Processing Routine] Data processing routine completed successfully
+2025-03-14T16:53:09.744Z [SUCCESS] [Data Processing Routine] Completed Data Processing Routine (completed in 502ms)
+2025-03-14T16:53:09.744Z [INFO] [API Call Simulation] Starting API Call Simulation
+2025-03-14T16:53:09.744Z [INFO] [API Call Simulation] Executing API call simulation
+2025-03-14T16:53:10.745Z [ERROR] [API Call Simulation] Error in API Call Simulation: Simulated error in API call simulation
+2025-03-14T16:53:10.746Z [SUCCESS] [API Call Simulation] Completed API Call Simulation (completed in 1002ms)
+2025-03-14T16:53:10.747Z [INFO] [Error Handling Routine] Starting Error Handling Routine
+2025-03-14T16:53:10.747Z [INFO] [Error Handling Routine] Executing Error handling routine
+2025-03-14T16:53:11.497Z [SUCCESS] [Error Handling Routine] Error handling routine completed successfully
+2025-03-14T16:53:11.497Z [SUCCESS] [Error Handling Routine] Completed Error Handling Routine (completed in 750ms)
+2025-03-14T16:53:11.497Z [INFO] [Parent Workflow] Starting Parent Workflow
+2025-03-14T16:53:11.497Z [INFO] [Parent Workflow] Starting parent workflow with nested children
+2025-03-14T16:53:11.497Z [INFO] [Child Workflow - Data Fetching] Starting Child Workflow - Data Fetching
+2025-03-14T16:53:11.498Z [INFO] [Child Workflow - Data Fetching] Executing Data fetching workflow
+2025-03-14T16:53:11.798Z [SUCCESS] [Child Workflow - Data Fetching] Data fetching workflow completed successfully
+2025-03-14T16:53:11.799Z [SUCCESS] [Child Workflow - Data Fetching] Completed Child Workflow - Data Fetching (completed in 302ms)
+2025-03-14T16:53:11.799Z [INFO] [Child Workflow - Data Processing] Starting Child Workflow - Data Processing
+2025-03-14T16:53:11.799Z [INFO] [Child Workflow - Data Processing] Executing Data processing workflow
+2025-03-14T16:53:12.200Z [SUCCESS] [Child Workflow - Data Processing] Data processing workflow completed successfully
+2025-03-14T16:53:12.201Z [SUCCESS] [Child Workflow - Data Processing] Completed Child Workflow - Data Processing (completed in 402ms)
+2025-03-14T16:53:12.201Z [SUCCESS] [Parent Workflow] Completed Parent Workflow (completed in 800ms)
+2025-03-14T16:53:12.201Z [DEBUG] [Markdown Log Test] This is a debug message with detailed information
+2025-03-14T16:53:12.201Z [WARNING] [Markdown Log Test] This is a warning message about potential issues
+2025-03-14T16:53:12.201Z [INFO] [Markdown Log Test] This is an informational message about the test progress
+2025-03-14T16:53:12.201Z [SUCCESS] [Markdown Log Test] Completed Markdown Log Test (completed in 2965ms)
+2025-03-14T16:53:12.202Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T16-53-09-235Z.md
+2025-03-14T17:14:24.632Z [INFO] [Markdown Log Test] Starting Markdown Log Test
+2025-03-14T17:14:24.638Z [INFO] [Markdown Log Test] Starting Markdown log test with descriptive subroutine names
+2025-03-14T17:14:24.638Z [INFO] [Data Processing Routine] Starting Data Processing Routine
+2025-03-14T17:14:24.638Z [INFO] [Data Processing Routine] Executing Data processing routine
+2025-03-14T17:14:25.144Z [SUCCESS] [Data Processing Routine] Data processing routine completed successfully
+2025-03-14T17:14:25.145Z [SUCCESS] [Data Processing Routine] Completed Data Processing Routine (completed in 507ms)
+2025-03-14T17:14:25.145Z [INFO] [API Call Simulation] Starting API Call Simulation
+2025-03-14T17:14:25.145Z [INFO] [API Call Simulation] Executing API call simulation
+2025-03-14T17:14:26.147Z [ERROR] [API Call Simulation] Error in API Call Simulation: Simulated error in API call simulation
+2025-03-14T17:14:26.148Z [SUCCESS] [API Call Simulation] Completed API Call Simulation (completed in 1003ms)
+2025-03-14T17:14:26.148Z [INFO] [Error Handling Routine] Starting Error Handling Routine
+2025-03-14T17:14:26.148Z [INFO] [Error Handling Routine] Executing Error handling routine
+2025-03-14T17:14:26.898Z [SUCCESS] [Error Handling Routine] Error handling routine completed successfully
+2025-03-14T17:14:26.899Z [SUCCESS] [Error Handling Routine] Completed Error Handling Routine (completed in 751ms)
+2025-03-14T17:14:26.899Z [INFO] [Parent Workflow] Starting Parent Workflow
+2025-03-14T17:14:26.899Z [INFO] [Parent Workflow] Starting parent workflow with nested children
+2025-03-14T17:14:26.899Z [INFO] [Child Workflow - Data Fetching] Starting Child Workflow - Data Fetching
+2025-03-14T17:14:26.899Z [INFO] [Child Workflow - Data Fetching] Executing Data fetching workflow
+2025-03-14T17:14:27.200Z [SUCCESS] [Child Workflow - Data Fetching] Data fetching workflow completed successfully
+2025-03-14T17:14:27.201Z [SUCCESS] [Child Workflow - Data Fetching] Completed Child Workflow - Data Fetching (completed in 302ms)
+2025-03-14T17:14:27.201Z [INFO] [Child Workflow - Data Processing] Starting Child Workflow - Data Processing
+2025-03-14T17:14:27.201Z [INFO] [Child Workflow - Data Processing] Executing Data processing workflow
+2025-03-14T17:14:27.603Z [SUCCESS] [Child Workflow - Data Processing] Data processing workflow completed successfully
+2025-03-14T17:14:27.603Z [SUCCESS] [Child Workflow - Data Processing] Completed Child Workflow - Data Processing (completed in 402ms)
+2025-03-14T17:14:27.603Z [SUCCESS] [Parent Workflow] Completed Parent Workflow (completed in 800ms)
+2025-03-14T17:14:27.603Z [DEBUG] [Markdown Log Test] This is a debug message with detailed information
+2025-03-14T17:14:27.603Z [WARNING] [Markdown Log Test] This is a warning message about potential issues
+2025-03-14T17:14:27.603Z [INFO] [Markdown Log Test] This is an informational message about the test progress
+2025-03-14T17:14:27.603Z [SUCCESS] [Markdown Log Test] Completed Markdown Log Test (completed in 2971ms)
+2025-03-14T17:14:27.604Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-14-24-632Z.md

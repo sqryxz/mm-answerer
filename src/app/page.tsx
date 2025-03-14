@@ -6,6 +6,18 @@ import ResponseDisplay from '@/components/ResponseDisplay';
 import QueryHistory from '@/components/QueryHistory';
 import { QuerySettings } from '@/components/QueryForm';
 
+// Client-side logger
+const clientLog = (message: string, level: string = 'INFO', subroutine?: string) => {
+  const timestamp = new Date().toISOString();
+  const subroutineStr = subroutine ? `[${subroutine}]` : '';
+  const logMessage = `${timestamp} [${level}] ${subroutineStr} ${message}`;
+  
+  console.log(logMessage);
+  
+  // In a production app, you might want to send logs to the server
+  // or use a service like Sentry for client-side logging
+};
+
 interface ResponseData {
   query: string;
   geminiResponse: string;
@@ -29,26 +41,39 @@ export default function Home() {
 
   // Load history from localStorage on component mount
   useEffect(() => {
+    clientLog('Application started', 'INFO', 'APP_INIT');
     const savedHistory = localStorage.getItem('queryHistory');
     if (savedHistory) {
       try {
         setHistory(JSON.parse(savedHistory));
+        clientLog(`Loaded ${JSON.parse(savedHistory).length} history items`, 'INFO', 'HISTORY_LOAD');
       } catch (e) {
-        console.error('Failed to parse history from localStorage:', e);
+        clientLog(`Failed to parse history from localStorage: ${e}`, 'ERROR', 'HISTORY_LOAD');
       }
     }
+    
+    return () => {
+      clientLog('Application closing', 'INFO', 'APP_CLEANUP');
+    };
   }, []);
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('queryHistory', JSON.stringify(history));
+    if (history.length > 0) {
+      clientLog(`Saved ${history.length} history items to localStorage`, 'DEBUG', 'HISTORY_SAVE');
+    }
   }, [history]);
 
   const handleSubmit = async (query: string, settings: QuerySettings) => {
+    clientLog(`Submitting query: "${query}"`, 'INFO', 'QUERY_SUBMIT');
+    const startTime = Date.now();
+    
     setIsLoading(true);
     setError(null);
     
     try {
+      clientLog('Sending request to API', 'INFO', 'API_REQUEST');
       const response = await fetch('/api/merge', {
         method: 'POST',
         headers: {
@@ -56,14 +81,16 @@ export default function Home() {
         },
         body: JSON.stringify({ query, settings }),
       });
-
+      
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`API responded with status: ${response.status}`);
       }
-
+      
       const data = await response.json();
+      clientLog('Received response from API', 'SUCCESS', 'API_RESPONSE');
+      
       setResponseData(data);
-
+      
       // Add to history
       const newHistoryItem: HistoryItem = {
         id: Date.now().toString(),
@@ -72,64 +99,61 @@ export default function Home() {
         responses: data,
         settings,
       };
-
-      setHistory((prev) => [newHistoryItem, ...prev]);
+      
+      setHistory(prev => [newHistoryItem, ...prev]);
+      clientLog('Added query to history', 'INFO', 'HISTORY_UPDATE');
+      
     } catch (err) {
-      console.error('Error submitting query:', err);
-      setError('Failed to get responses. Please check your API keys and try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      clientLog(`Error: ${errorMessage}`, 'ERROR', 'API_REQUEST');
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
+      const duration = Date.now() - startTime;
+      clientLog(`Query completed in ${duration}ms`, 'INFO', 'QUERY_COMPLETE');
     }
   };
 
   const handleSelectQuery = (id: string) => {
-    const item = history.find((h) => h.id === id);
+    clientLog(`Selected history item: ${id}`, 'INFO', 'HISTORY_SELECT');
+    const item = history.find(h => h.id === id);
     if (item) {
       setResponseData(item.responses);
     }
   };
 
   const handleClearHistory = () => {
+    clientLog('Clearing query history', 'INFO', 'HISTORY_CLEAR');
     setHistory([]);
-    localStorage.removeItem('queryHistory');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Multi-Model Answer Merger
-          </h1>
-          <p className="mt-3 text-xl text-gray-500">
-            Ask one question, get answers from multiple AI models, merged into a unified response.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <QueryForm onSubmit={handleSubmit} isLoading={isLoading} />
-
+    <main className="container mx-auto p-4 max-w-6xl">
+      <h1 className="text-3xl font-bold mb-6 text-center">Multi-Model Answer</h1>
+      <p className="text-center mb-8 text-gray-600">
+        Ask a question and get responses from multiple AI models, intelligently merged into a comprehensive answer.
+      </p>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-1">
           <QueryHistory 
             history={history} 
             onSelectQuery={handleSelectQuery} 
-            onClearHistory={handleClearHistory} 
+            onClearHistory={handleClearHistory}
           />
-
+        </div>
+        
+        <div className="lg:col-span-3">
+          <QueryForm onSubmit={handleSubmit} isLoading={isLoading} />
+          
           {error && (
-            <div className="mt-6 w-full max-w-3xl p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
-              {error}
+            <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              Error: {error}
             </div>
           )}
-
-          {isLoading && (
-            <div className="mt-8 flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Querying multiple AI models...</p>
-            </div>
-          )}
-
-          {responseData && !isLoading && (
-            <ResponseDisplay
+          
+          {responseData && !error && (
+            <ResponseDisplay 
               query={responseData.query}
               geminiResponse={responseData.geminiResponse}
               deepseekResponse={responseData.deepseekResponse}
@@ -138,6 +162,6 @@ export default function Home() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

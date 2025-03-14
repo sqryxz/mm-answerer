@@ -6,8 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:alt": "next start -p 3001",
     "lint": "next lint",
-    "test-merge": "node src/test-merge.js"
+    "test-merge": "node src/test-merge.js",
+    "logs": "mkdir -p logs && cat logs/app-$(date +%Y-%m-%d).log",
+    "analyze-logs": "node scripts/analyze-logs.js",
+    "md-logs": "ls -la logs/md/",
+    "view-md-log": "node scripts/view-md-log.js",
+    "test-md-log": "node scripts/test-md-log.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",

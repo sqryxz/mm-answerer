@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { OpenAI } from 'openai';
+import { log, logStart, logComplete, logError, createTimer, LogLevel, generateRunSummary } from '@/utils/logger';
 
 // Initialize the Gemini API client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -25,6 +26,9 @@ export const config = {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export async function POST(request: NextRequest) {
+  const appTimer = createTimer();
+  logStart('API_REQUEST');
+  
   try {
     const { query, settings } = await request.json();
     const querySettings: QuerySettings = settings || {
@@ -32,7 +36,10 @@ export async function POST(request: NextRequest) {
       systemPrompt: 'You are a helpful assistant.',
     };
 
+    log(`Processing query: "${query}"`, LogLevel.INFO, 'API_REQUEST');
+
     if (!query) {
+      logError('API_REQUEST', 'Query is required');
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
@@ -42,17 +49,23 @@ export async function POST(request: NextRequest) {
     
     // Try Gemini API
     try {
+      logStart('GEMINI_QUERY');
+      const geminiTimer = createTimer();
       geminiResponse = await queryGemini(query, querySettings);
+      logComplete('GEMINI_QUERY', geminiTimer());
     } catch (error) {
-      console.error('Error with Gemini API');
+      logError('GEMINI_QUERY', error);
       geminiResponse = "Error querying Gemini: Unable to get response";
     }
     
     // Try Deepseek API
     try {
+      logStart('DEEPSEEK_QUERY');
+      const deepseekTimer = createTimer();
       deepseekResponse = await queryDeepseek(query, querySettings);
+      logComplete('DEEPSEEK_QUERY', deepseekTimer());
     } catch (error) {
-      console.error('Error with Deepseek API');
+      logError('DEEPSEEK_QUERY', error);
       deepseekResponse = "Error querying Deepseek: Unable to get response";
     }
     
@@ -64,8 +77,12 @@ export async function POST(request: NextRequest) {
     if (hasGeminiResponse && hasDeepseekResponse) {
       // Try to merge both responses
       try {
+        logStart('MERGE_RESPONSES');
+        const mergeTimer = createTimer();
         mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
+        logComplete('MERGE_RESPONSES', mergeTimer());
       } catch (error) {
+        logError('MERGE_RESPONSES', error);
         // Fallback if merging fails
         mergedResponse = `
 # Combined Response to: "${query}"
@@ -78,6 +95,7 @@ ${deepseekResponse}
 `;
       }
     } else if (hasGeminiResponse) {
+      log('Using Gemini response only', LogLevel.INFO, 'API_REQUEST');
       mergedResponse = `
 # Response to: "${query}"
 
@@ -86,6 +104,7 @@ ${geminiResponse}
 *Note: This response is from Gemini AI only.*
 `;
     } else if (hasDeepseekResponse) {
+      log('Using Deepseek response only', LogLevel.INFO, 'API_REQUEST');
       mergedResponse = `
 # Response to: "${query}"
 
@@ -95,6 +114,7 @@ ${deepseekResponse}
 `;
     } else {
       // Neither API returned a valid response
+      log('No valid responses from either API', LogLevel.WARNING, 'API_REQUEST');
       mergedResponse = `
 # Response to: "${query}"
 
@@ -106,6 +126,11 @@ Sorry, we couldn't get a complete response at this time. Please try again later.
 `;
     }
 
+    logComplete('API_REQUEST', appTimer());
+    
+    // Generate a run summary for this API request
+    generateRunSummary();
+    
     // Always return a response, even if there were errors
     return NextResponse.json({ 
       query,
@@ -115,8 +140,11 @@ Sorry, we couldn't get a complete response at this time. Please try again later.
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error processing request:', error);
+    logError('API_REQUEST', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Generate a run summary even if there was an error
+    generateRunSummary();
     
     // Even for general errors, return a response instead of an error status
     return NextResponse.json({ 
@@ -132,7 +160,11 @@ Sorry, we couldn't get a complete response at this time. Please try again later.
 }
 
 async function queryGemini(query: string, settings: QuerySettings): Promise<string> {
+  const timer = createTimer();
+  logStart('GEMINI_PROCESS');
+  
   try {
+    log('Initializing Gemini model', LogLevel.DEBUG, 'GEMINI_PROCESS');
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.0-flash',
       generationConfig: {
@@ -144,16 +176,24 @@ async function queryGemini(query: string, settings: QuerySettings): Promise<stri
     // Use direct content generation with system instruction and user query
     const systemAndQuery = `${settings.systemPrompt}\n\n${query}`;
     
+    log('Sending request to Gemini API', LogLevel.DEBUG, 'GEMINI_PROCESS');
     const result = await model.generateContent(systemAndQuery);
-    return result.response.text() || 'No content returned from Gemini API.';
+    const response = result.response.text() || 'No content returned from Gemini API.';
+    
+    logComplete('GEMINI_PROCESS', timer());
+    return response;
   } catch (error: unknown) {
-    console.error('Error querying Gemini:', error);
+    logError('GEMINI_PROCESS', error);
     throw error; // Propagate the error for better handling upstream
   }
 }
 
 async function queryDeepseek(query: string, settings: QuerySettings): Promise<string> {
+  const timer = createTimer();
+  logStart('DEEPSEEK_PROCESS');
+  
   try {
+    log('Preparing Deepseek request', LogLevel.DEBUG, 'DEEPSEEK_PROCESS');
     // Set a maximum token limit to ensure faster responses
     const response = await deepseekClient.chat.completions.create({
       model: 'deepseek-chat',
@@ -165,9 +205,11 @@ async function queryDeepseek(query: string, settings: QuerySettings): Promise<st
       max_tokens: 1000, // Limit response length to ensure faster responses
     });
     
-    return response.choices[0].message.content || 'No content returned from Deepseek API.';
+    const result = response.choices[0].message.content || 'No content returned from Deepseek API.';
+    logComplete('DEEPSEEK_PROCESS', timer());
+    return result;
   } catch (error: unknown) {
-    console.error('Error querying Deepseek:', error);
+    logError('DEEPSEEK_PROCESS', error);
     throw error; // Propagate the error for better handling upstream
   }
 }
@@ -178,7 +220,11 @@ async function mergeResponses(
   deepseekResponse: string,
   settings: QuerySettings
 ): Promise<string> {
+  const timer = createTimer();
+  logStart('MERGE_PROCESS');
+  
   try {
+    log('Initializing Gemini model for merging', LogLevel.DEBUG, 'MERGE_PROCESS');
     // Use Gemini to merge the responses intelligently
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-2.0-flash',
@@ -209,11 +255,15 @@ Please analyze both responses and create a comprehensive merged answer that:
 Your merged response should be more valuable than either individual response alone.
 `;
 
+    log('Sending merge request to Gemini API', LogLevel.DEBUG, 'MERGE_PROCESS');
     // Use direct content generation
     const result = await model.generateContent(mergePrompt);
-    return result.response.text() || 'Failed to merge responses.';
+    const response = result.response.text() || 'Failed to merge responses.';
+    
+    logComplete('MERGE_PROCESS', timer());
+    return response;
   } catch (error: unknown) {
-    console.error('Error merging responses:', error);
+    logError('MERGE_PROCESS', error);
     throw error; // Propagate the error for better handling upstream
   }
 } 

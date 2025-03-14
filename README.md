@@ -8,6 +8,8 @@ A web application that takes a single question, queries multiple AI models (Deep
 - View individual responses from each model
 - See a merged response that combines insights from all models
 - Simple and intuitive user interface
+- Comprehensive logging system for tracking application execution and subroutines
+- Markdown log generation for each application run
 
 ## Technologies Used
 
@@ -56,6 +58,16 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Alternative Port
+
+If you encounter a port conflict (EADDRINUSE error), you can start the application on an alternative port:
+
+```bash
+npm run start:alt
+```
+
+This will start the application on port 3001 instead of the default port 3000.
+
 ## Deployment to Vercel
 
 This project is configured for easy deployment to Vercel.
@@ -93,6 +105,41 @@ To add more AI models:
 1. Add the new API key to your `.env.local` file
 2. Update the API route handler in `src/app/api/merge/route.ts` to include the new model
 3. Modify the `ResponseDisplay` component to include a new tab for the added model
+
+## Logging System
+
+The application includes a comprehensive logging system that tracks:
+- Application startup and shutdown
+- API requests and responses
+- Subroutine execution and completion
+- Error handling
+- Performance metrics (execution time)
+
+### Viewing Logs
+
+You can view the current day's text logs using:
+
+```bash
+npm run logs
+```
+
+### Markdown Logs
+
+The application generates a Markdown log file for each run, providing a readable and shareable format for logs. You can:
+
+- List all Markdown logs: `npm run md-logs`
+- View the most recent log: `npm run view-md-log`
+- View a specific log: `npm run view-md-log -- <filename>`
+
+### Log Analysis
+
+You can analyze log performance and error patterns using:
+
+```bash
+npm run analyze-logs
+```
+
+For more details about the logging system, see [LOGGING.md](LOGGING.md).
 
 ## License
 
