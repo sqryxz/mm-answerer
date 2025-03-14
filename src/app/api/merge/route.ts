@@ -102,7 +102,6 @@ export async function POST(request: NextRequest) {
         mergedResponse = mergeResult as string;
       } catch (error: unknown) {
         console.error('Error merging responses:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         
         // Use a simple fallback that doesn't require Gemini
         mergedResponse = `
