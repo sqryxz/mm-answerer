@@ -45,7 +45,6 @@ export default function ResponseDisplay({
   };
 
   const exportAsMarkdown = () => {
-    // eslint-disable-next-line react/no-unescaped-entities
     const content = `# Multi-Model Answer to: "${query}"
 
 ## Gemini Response
