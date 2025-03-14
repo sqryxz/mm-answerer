@@ -223,7 +223,7 @@ export function generateRunSummary(): void {
     fs.appendFileSync(MD_LOG_FILE, `| Subroutine | Status | Duration | Errors |\n`);
     fs.appendFileSync(MD_LOG_FILE, `| --- | --- | --- | --- |\n`);
     
-    for (const [code, data] of Object.entries(subroutines)) {
+    for (const data of Object.values(subroutines)) {
       const status = data.completed ? '✅ Completed' : (data.started ? '⚠️ Started but not completed' : '❌ Not started');
       const duration = (data.startTime && data.endTime) 
         ? `${data.endTime - data.startTime}ms` 

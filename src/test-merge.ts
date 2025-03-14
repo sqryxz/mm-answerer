@@ -67,81 +67,14 @@ Your merged response should be more valuable than either individual response alo
 }
 
 // Test data
-const testQuery = "What are the key differences between React and Vue?";
-
-const geminiResponse = `
-# React vs Vue: Key Differences
-
-React and Vue are both popular JavaScript frameworks for building user interfaces, but they have several key differences:
-
-## Component Structure
-- **React**: Uses JSX, a syntax extension that allows you to write HTML-like code in JavaScript
-- **Vue**: Uses templates that are more similar to traditional HTML, with special directives
-
-## State Management
-- **React**: Relies on unidirectional data flow and requires external libraries like Redux for complex state management
-- **Vue**: Has built-in state management with Vuex, though it's optional
-
-## Learning Curve
-- **React**: Steeper learning curve, especially for beginners who aren't familiar with JavaScript concepts
-- **Vue**: Generally considered easier to learn with more intuitive syntax and better documentation
-
-## Performance
-- **React**: Uses a virtual DOM and has excellent performance for complex applications
-- **Vue**: Also uses a virtual DOM but with additional optimizations that can make it faster in some cases
-
-## Flexibility vs Convention
-- **React**: More flexible but requires more decisions about project structure and additional libraries
-- **Vue**: More opinionated with built-in solutions for common problems
-
-## Community and Ecosystem
-- **React**: Larger community and ecosystem, backed by Facebook
-- **Vue**: Smaller but growing community, created and led by Evan You
-
-Both frameworks are excellent choices depending on your specific needs and preferences.
-`;
-
-const deepseekResponse = `
-React and Vue are two of the most popular frontend JavaScript frameworks. Here are the key differences between them:
-
-### Philosophy and Design
-- **React** is a library focused primarily on the view layer, giving developers more freedom to choose additional libraries for routing, state management, etc.
-- **Vue** is a more complete framework that provides official solutions for common needs like routing and state management.
-
-### Syntax and Templates
-- **React** uses JSX, which combines JavaScript and HTML-like syntax in the same file.
-- **Vue** uses HTML templates with special directives (like v-if, v-for) that may feel more familiar to traditional web developers.
-
-### Component Structure
-- **React** components typically combine logic and presentation in a single file.
-- **Vue** uses a more explicit separation with template, script, and style sections in Single File Components.
-
-### State Management
-- **React** uses hooks (useState, useEffect) in functional components or setState in class components.
-- **Vue** uses a reactive data property in components and provides Vuex for centralized state management.
-
-### Learning Curve
-- **React** has a steeper learning curve if you're not familiar with JavaScript concepts like functional programming.
-- **Vue** is often considered easier to learn for beginners due to its more straightforward syntax and comprehensive documentation.
-
-### Performance
-Both frameworks offer similar performance characteristics, with Vue sometimes having a slight edge in specific scenarios due to its more fine-grained reactivity system.
-
-### Community and Support
-- **React** has a larger community and ecosystem, with more third-party libraries and components available.
-- **Vue** has excellent documentation and a growing community.
-
-### Corporate Backing
-- **React** is developed and maintained by Facebook.
-- **Vue** was created by an individual developer (Evan You) and is now supported by a team of core contributors and sponsors.
-
-The choice between React and Vue often comes down to team preference, project requirements, and existing expertise.
-`;
-
-const settings: QuerySettings = {
-  temperature: 0.7,
-  systemPrompt: 'You are a helpful assistant.'
-};
+// Commented out unused variables to fix linting errors
+// const testQuery = "What are the key differences between React and Vue?";
+// const geminiResponse = `...`;
+// const deepseekResponse = `...`;
+// const settings: QuerySettings = {
+//   temperature: 0.7,
+//   systemPrompt: 'You are a helpful assistant.'
+// };
 
 // Run the test
 async function runTest() {

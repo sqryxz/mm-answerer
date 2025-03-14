@@ -88,3 +88,12 @@
 2025-03-14T17:14:27.603Z [INFO] [Markdown Log Test] This is an informational message about the test progress
 2025-03-14T17:14:27.603Z [SUCCESS] [Markdown Log Test] Completed Markdown Log Test (completed in 2971ms)
 2025-03-14T17:14:27.604Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-14-24-632Z.md
+2025-03-14T17:22:10.246Z [WARNING] [Process Manager] Application terminated by user
+2025-03-14T17:22:10.249Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-10-211Z.md
+2025-03-14T17:22:10.249Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-10-211Z.md
+2025-03-14T17:22:10.387Z [WARNING] [Process Manager] Application terminated by user
+2025-03-14T17:22:10.389Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-09-289Z.md
+2025-03-14T17:22:10.390Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-09-289Z.md
+2025-03-14T17:24:30.630Z [WARNING] [Process Manager] Application terminated by user
+2025-03-14T17:24:30.634Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-46-184Z.md
+2025-03-14T17:24:30.634Z [INFO] [Logging System] Generated run summary in /Users/jeremy/multi-model-answer/logs/md/run-2025-03-14T17-22-46-184Z.md

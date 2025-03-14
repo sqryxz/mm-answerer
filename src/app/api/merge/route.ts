@@ -22,9 +22,6 @@ export const config = {
   runtime: 'edge',
 };
 
-// Disable specific ESLint rule for the file
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 export async function POST(request: NextRequest) {
   const appTimer = createTimer();
   logStart('API_REQUEST');
