@@ -56,6 +56,30 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Deployment to Vercel
+
+This project is configured for easy deployment to Vercel.
+
+1. Push your code to a GitHub repository.
+
+2. Visit [Vercel](https://vercel.com) and sign in with your GitHub account.
+
+3. Click "New Project" and import your repository.
+
+4. Configure the project:
+   - Framework Preset: Next.js (should be auto-detected)
+   - Root Directory: ./
+   - Build Command: npm run build (default)
+   - Output Directory: .next (default)
+
+5. Add the following environment variables in the Vercel project settings:
+   - `DEEPSEEK_API_KEY`: Your Deepseek API key
+   - `GEMINI_API_KEY`: Your Google Gemini API key
+
+6. Click "Deploy" and wait for the deployment to complete.
+
+7. Your application will be available at the URL provided by Vercel.
+
 ## Usage
 
 1. Enter your question in the text area
