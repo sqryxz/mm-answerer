@@ -23,7 +23,7 @@ export const config = {
 };
 
 // Add a GET handler to handle GET requests
-export async function GET(request: NextRequest) {
+export async function GET() {
   return NextResponse.json({ 
     message: 'This endpoint requires a POST request with a JSON body containing a query field.',
     example: {
