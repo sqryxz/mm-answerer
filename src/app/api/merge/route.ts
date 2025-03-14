@@ -16,14 +16,6 @@ interface QuerySettings {
   systemPrompt: string;
 }
 
-// Define a custom error type
-interface ApiError extends Error {
-  status?: number;
-  statusText?: string;
-  errorDetails?: unknown;
-  message: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { query, settings } = await request.json();
