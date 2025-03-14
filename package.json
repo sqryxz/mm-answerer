@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test-merge": "node src/test-merge.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
     "axios": "^1.8.3",
+    "dotenv": "^16.4.7",
     "next": "15.2.2",
     "openai": "^4.87.3",
     "react": "^19.0.0",
@@ -27,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.2",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
