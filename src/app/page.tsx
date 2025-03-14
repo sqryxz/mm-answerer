@@ -26,7 +26,7 @@ export default function Home() {
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [currentSettings, setCurrentSettings] = useState<QuerySettings>({
+  const [settings, setSettings] = useState<QuerySettings>({
     temperature: 0.7,
     systemPrompt: 'You are a helpful assistant.',
   });
@@ -51,7 +51,6 @@ export default function Home() {
   const handleSubmit = async (query: string, settings: QuerySettings) => {
     setIsLoading(true);
     setError(null);
-    setCurrentSettings(settings);
     
     try {
       const response = await fetch('/api/merge', {
@@ -91,7 +90,7 @@ export default function Home() {
     const item = history.find((h) => h.id === id);
     if (item) {
       setResponseData(item.responses);
-      setCurrentSettings(item.settings);
+      setSettings(item.settings);
     }
   };
 

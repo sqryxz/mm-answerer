@@ -45,6 +45,7 @@ export default function ResponseDisplay({
   };
 
   const exportAsMarkdown = () => {
+    // eslint-disable-next-line react/no-unescaped-entities
     const content = `# Multi-Model Answer to: "${query}"
 
 ## Gemini Response
@@ -104,7 +105,7 @@ ${mergedResponse}
               ? 'Combined Response' 
               : activeTab === 'gemini' 
                 ? 'Gemini Response' 
-                : 'Deepseek Response'} to: "{query}"
+                : 'Deepseek Response'} to: &quot;{query}&quot;
           </h2>
           <div className="flex gap-2 relative">
             <button
