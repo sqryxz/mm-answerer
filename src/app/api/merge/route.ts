@@ -16,20 +16,14 @@ interface QuerySettings {
   systemPrompt: string;
 }
 
-// Set a shorter timeout for API calls to prevent Vercel timeouts
-const API_TIMEOUT = 5000; // 5 seconds to leave room for processing
-
-// Helper function to create a promise that rejects after a timeout
-function timeoutPromise(ms: number) {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms);
-  });
-}
-
 // Configure the API route for Vercel
 export const config = {
   runtime: 'edge',
 };
+
+// Disable specific ESLint rules for the file
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,31 +37,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
 
-    let geminiResponse: string = "Attempting to get response from Gemini...";
-    let deepseekResponse: string = "Attempting to get response from Deepseek...";
-    let mergedResponse: string = "";
+    let geminiResponse = "Attempting to get response from Gemini...";
+    let deepseekResponse = "Attempting to get response from Deepseek...";
+    let mergedResponse = "";
     
-    // Try Gemini API with timeout
+    // Try Gemini API
     try {
-      const geminiResult = await Promise.race([
-        queryGemini(query, querySettings),
-        timeoutPromise(API_TIMEOUT)
-      ]);
-      geminiResponse = geminiResult as string;
+      geminiResponse = await queryGemini(query, querySettings);
     } catch (error) {
-      console.error('Error or timeout with Gemini API:', error);
+      console.error('Error with Gemini API');
       geminiResponse = "Error querying Gemini: Unable to get response";
     }
     
-    // Try Deepseek API with timeout
+    // Try Deepseek API
     try {
-      const deepseekResult = await Promise.race([
-        queryDeepseek(query, querySettings),
-        timeoutPromise(API_TIMEOUT)
-      ]);
-      deepseekResponse = deepseekResult as string;
+      deepseekResponse = await queryDeepseek(query, querySettings);
     } catch (error) {
-      console.error('Error or timeout with Deepseek API:', error);
+      console.error('Error with Deepseek API');
       deepseekResponse = "Error querying Deepseek: Unable to get response";
     }
     
@@ -79,21 +65,7 @@ export async function POST(request: NextRequest) {
     if (hasGeminiResponse && hasDeepseekResponse) {
       // Try to merge both responses
       try {
-        mergedResponse = await Promise.race([
-          mergeResponses(query, geminiResponse, deepseekResponse, querySettings),
-          timeoutPromise(API_TIMEOUT)
-        ]).catch(() => {
-          // Fallback if merging times out
-          return `
-# Combined Response to: "${query}"
-
-## Gemini Response
-${geminiResponse}
-
-## Deepseek Response
-${deepseekResponse}
-`;
-        });
+        mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
       } catch (error) {
         // Fallback if merging fails
         mergedResponse = `
@@ -143,7 +115,7 @@ Sorry, we couldn't get a complete response at this time. Please try again later.
       mergedResponse,
       timestamp: new Date().toISOString()
     });
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error processing request:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
