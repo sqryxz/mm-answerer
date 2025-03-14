@@ -21,9 +21,8 @@ export const config = {
   runtime: 'edge',
 };
 
-// Disable specific ESLint rules for the file
+// Disable specific ESLint rule for the file
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export async function POST(request: NextRequest) {
   try {
