@@ -16,6 +16,14 @@ interface QuerySettings {
   systemPrompt: string;
 }
 
+// Define a custom error type
+interface ApiError extends Error {
+  status?: number;
+  statusText?: string;
+  errorDetails?: unknown;
+  message: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { query, settings } = await request.json();
@@ -33,25 +41,28 @@ export async function POST(request: NextRequest) {
     try {
       // Query Gemini API
       geminiResponse = await queryGemini(query, querySettings);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error querying Gemini:', error);
-      geminiResponse = `Error querying Gemini: ${error?.message || 'Unknown error'}`;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      geminiResponse = `Error querying Gemini: ${errorMessage}`;
     }
 
     try {
       // Query Deepseek API
       deepseekResponse = await queryDeepseek(query, querySettings);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error querying Deepseek:', error);
-      deepseekResponse = `Error querying Deepseek: ${error?.message || 'Unknown error'}`;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      deepseekResponse = `Error querying Deepseek: ${errorMessage}`;
     }
 
     try {
       // Merge the responses
       mergedResponse = await mergeResponses(query, geminiResponse, deepseekResponse, querySettings);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error merging responses:', error);
-      mergedResponse = `Error merging responses: ${error?.message || 'Unknown error'}`;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      mergedResponse = `Error merging responses: ${errorMessage}`;
     }
 
     return NextResponse.json({ 
@@ -60,11 +71,12 @@ export async function POST(request: NextRequest) {
       deepseekResponse,
       mergedResponse
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error processing request:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ 
       error: 'Failed to process request', 
-      details: error?.message || 'Unknown error' 
+      details: errorMessage
     }, { status: 500 });
   }
 }
@@ -90,7 +102,7 @@ async function queryGemini(query: string, settings: QuerySettings): Promise<stri
     const result = await chat.sendMessage(query);
     
     return result.response.text();
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error querying Gemini:', error);
     throw error; // Propagate the error for better debugging
   }
@@ -108,7 +120,7 @@ async function queryDeepseek(query: string, settings: QuerySettings): Promise<st
     });
     
     return response.choices[0].message.content || '';
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error querying Deepseek:', error);
     throw error; // Propagate the error for better debugging
   }
@@ -160,7 +172,7 @@ Your merged response should be more valuable than either individual response alo
     const mergedContent = result.response.text();
     
     return mergedContent;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error merging responses:', error);
     
     // Fallback to simple merging if intelligent merging fails
